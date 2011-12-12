@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
-    package="adt.android.RdpClient"
+    package="com.zhai.RdpClient"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -23,7 +23,7 @@
         </activity>
         <activity
             android:label="canvas"
-            android:name=".CanvasActivity" >
+            android:name="com.zhai.RdpClient.CanvasActivity" >
             <intent-filter >
             </intent-filter>
         </activity>

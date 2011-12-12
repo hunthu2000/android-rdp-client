@@ -1,4 +1,4 @@
-package adt.android.RdpClient;
+package com.zhai.RdpClient;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
@@ -21,6 +21,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.PropertyConfigurator;
 
 
+import adt.android.RdpClient.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
