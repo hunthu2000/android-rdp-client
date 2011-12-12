@@ -1,11 +1,10 @@
 package com.zhai.RdpClient;
 
-import com.antlersoft.android.zoomer.ZoomControls;
-
-import adt.android.RdpClient.R;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+
+import com.antlersoft.android.zoomer.ZoomControls;
 
 public class CanvasActivity extends Activity {
 

@@ -20,10 +20,7 @@ import net.propero.rdp.rdp5.VChannels;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.PropertyConfigurator;
 
-
-import adt.android.RdpClient.R;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
