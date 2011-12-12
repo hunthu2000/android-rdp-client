@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <adt.android.RdpClient.RdpCanvas
+        android:id="@+id/vnc_canvas"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="bottom|center" >
+    </adt.android.RdpClient.RdpCanvas>
+
+    <com.antlersoft.android.zoomer.ZoomControls
+        android:id="@+id/zoomer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right" />
+
+</FrameLayout>
