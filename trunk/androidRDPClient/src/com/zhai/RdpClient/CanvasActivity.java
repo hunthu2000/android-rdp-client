@@ -1,4 +1,4 @@
-package adt.android.RdpClient;
+package com.zhai.RdpClient;
 
 import com.antlersoft.android.zoomer.ZoomControls;
 
