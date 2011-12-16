@@ -26,7 +26,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
-public class AndroidRDPClientActivity extends Activity {
+public class RdpActivity extends Activity {
 
 	private static final String TAG = "AndroidRDPClientActivity";
 
