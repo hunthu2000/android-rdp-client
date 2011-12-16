@@ -21,6 +21,8 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.PropertyConfigurator;
 
 import android.app.Activity;
+import android.content.res.Configuration;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -43,11 +45,13 @@ public class AndroidRDPClientActivity extends Activity {
 	static String server = "10.2.60.23";
 	static String password="312";
 	int logonflags = Rdp.RDP_LOGON_NORMAL;
-
-	// logonflags |= Rdp.RDP_LOGON_AUTO;
-
+	
 	// static SendEvent toolFrame = null;
-
+	
+	public void onConfigurationChanged(Configuration newConfig) {
+		// TODO Auto-generated method stub
+		super.onConfigurationChanged(newConfig);
+	}
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -301,7 +305,7 @@ public class AndroidRDPClientActivity extends Activity {
 		}
 
 		String server = null;
-		//logonflags |= Rdp.RDP_LOGON_AUTO;   // 自动登陆的话， 需要填上用户名和密码
+		logonflags |= Rdp.RDP_LOGON_AUTO;   // 自动登陆的话， 需要填上用户名和密码
 		if (g.getOptind() < args.length) {
 			int colonat = args[args.length - 1].indexOf(":", 0);
 			if (colonat == -1) {
@@ -367,7 +371,7 @@ public class AndroidRDPClientActivity extends Activity {
 				try {
 					RdpLayer.connect(Options.username, InetAddress
 							.getByName(server), logonflags, Options.domain,
-							Options.password, Options.command, Options.directory);
+							password, Options.command, Options.directory);
 
 					// Remove to get rid of sendEvent tool
 					if (showTools) {
@@ -389,7 +393,6 @@ public class AndroidRDPClientActivity extends Activity {
 						// logger.info("Connection successful");
 						// now show window after licence negotiation
 						RdpLayer.mainLoop(deactivated, ext_disc_reason);
-
 						if (deactivated[0]) {
 							/* clean disconnect */
 							System.exit(-1);
@@ -421,7 +424,8 @@ public class AndroidRDPClientActivity extends Activity {
 				} catch (ConnectionException e) {
 					String msg[] = { "Connection Exception", e.getMessage() };
 					// window.showErrorDialog(msg);
-					System.exit(-1);
+					//System.exit(-1);
+					this.finish();
 				} catch (UnknownHostException e) {
 					// error(e, RdpLayer, window, true);
 				} catch (SocketException s) {

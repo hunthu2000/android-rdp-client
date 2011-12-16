@@ -31,6 +31,7 @@ package net.propero.rdp;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.NoRouteToHostException;
@@ -42,6 +43,13 @@ import net.propero.rdp_src1_4.RdpPacket_Localised;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
+
+import com.zhai.RdpClient.Bitmaps;
+
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Bitmap.Config;
+import android.widget.Toast;
 
 public class Rdp {
 
@@ -58,9 +66,8 @@ public class Rdp {
 	public static int RDP5_NO_CURSOR_SHADOW = 0x20;
 
 	public static int RDP5_NO_CURSORSETTINGS = 0x40; /*
-														 * disables cursor
-														 * blinking
-														 */
+													 * disables cursor blinking
+													 */
 
 	protected static Logger logger = Logger.getLogger(Rdp.class);
 
@@ -218,17 +225,15 @@ public class Rdp {
 
 	protected Secure SecureLayer = null;
 
-	/* 
-	awt库
-	private RdesktopFrame frame = null;
+	/*
+	 * awt库 private RdesktopFrame frame = null;
+	 * 
+	 * private RdesktopCanvas surface = null;
+	 */
 
-	private RdesktopCanvas surface = null;
-	
-	*/
+	// protected Orders orders = null;
 
-	//protected Orders orders = null;
-
-	//private Cache cache = null;
+	// private Cache cache = null;
 
 	private int next_packet = 0;
 
@@ -417,9 +422,9 @@ public class Rdp {
 	public Rdp(VChannels channels) {
 		this.SecureLayer = new Secure(channels);
 		Common.secure = SecureLayer;
-	//	this.orders = new Orders();
-		//this.cache = new Cache();
-		//orders.registerCache(cache);
+		// this.orders = new Orders();
+		// this.cache = new Cache();
+		// orders.registerCache(cache);
 	}
 
 	/**
@@ -613,6 +618,7 @@ public class Rdp {
 	 * @throws CryptoException
 	 */
 	public void mainLoop(boolean[] deactivated, int[] ext_disc_reason)
+			// ext_disc_reason连接 中断 的原因
 			throws IOException, RdesktopException, OrderException,
 			CryptoException {
 		int[] type = new int[1];
@@ -637,17 +643,17 @@ public class Rdp {
 				logger.debug("Rdp.RDP_PDU_DEMAND_ACTIVE");
 				// get this after licence negotiation, just before the 1st
 				// order...
-				//NDC.push("processDemandActive");
+				// NDC.push("processDemandActive");
 				this.processDemandActive(data);
 				// can use this to trigger things that have to be done before
 				// 1st order
-				//logger.debug("ready to send (got past licence negotiation)");
-				/* 
-				awt库
-				Rdesktop.readytosend = true;
-				frame.triggerReadyToSend();
-				*/
-				//NDC.pop();
+				// logger.debug("ready to send (got past licence negotiation)");
+				/*
+				 * awt库 Rdesktop.readytosend = true; frame.triggerReadyToSend();
+				 */
+				// NDC.pop();
+
+				// 准备传输
 				deactivated[0] = false;
 				break;
 
@@ -658,12 +664,12 @@ public class Rdp {
 				break;
 
 			case (Rdp.RDP_PDU_DATA):
-				//logger.debug("Rdp.RDP_PDU_DATA");
+				// logger.debug("Rdp.RDP_PDU_DATA");
 				// all the others should be this
-				//NDC.push("processData");
+				// NDC.push("processData");
 
 				disc = this.processData(data, ext_disc_reason);
-				//NDC.pop();
+				// NDC.pop();
 				break;
 
 			case 0:
@@ -916,7 +922,7 @@ public class Rdp {
 
 		this.receive(type); // Receive an unknown PDU Code = 0x28
 
-		//this.orders.resetOrderState();
+		// this.orders.resetOrderState();
 	}
 
 	/**
@@ -964,20 +970,16 @@ public class Rdp {
 			break;
 		case (Rdp.RDP_DATA_PDU_BELL):
 			logger.debug("Received bell PDU");
-			/* 
-		awt库
-		Toolkit tx = Toolkit.getDefaultToolkit();
-			tx.beep();
-			
-			*/ 
+			/*
+			 * awt库 Toolkit tx = Toolkit.getDefaultToolkit(); tx.beep();
+			 */
 			break;
 		case (Rdp.RDP_DATA_PDU_LOGON):
 			logger.debug("User logged on");
-		
-		/* 
-		awt库
-		Rdesktop.loggedon = true;
-		*/
+
+			/*
+			 * awt库 Rdesktop.loggedon = true;
+			 */
 			break;
 		case RDP_DATA_PDU_DISCONNECT:
 			/*
@@ -1007,7 +1009,7 @@ public class Rdp {
 			data.incrementPosition(2); // pad
 			int n_orders = data.getLittleEndian16();
 			data.incrementPosition(2); // pad
-		//	this.orders.processOrders(data, next_packet, n_orders);
+			// this.orders.processOrders(data, next_packet, n_orders);
 			break;
 		case (Rdp.RDP_UPDATE_BITMAP):
 			this.processBitmapUpdates(data);
@@ -1179,10 +1181,10 @@ public class Rdp {
 		data.setLittleEndian16(0x6a1); /* Text capability flags */
 		data.incrementPosition(6); /* Pad */
 		data.setLittleEndian32(Constants.desktop_save ? 0x38400 : 0); /*
-																		 * Desktop
-																		 * cache
-																		 * size
-																		 */
+																	 * Desktop
+																	 * cache
+																	 * size
+																	 */
 		data.setLittleEndian32(0); /* Unknown */
 		data.setLittleEndian32(0x4e4); /* Unknown */
 	}
@@ -1326,9 +1328,9 @@ public class Rdp {
 		try {
 			data = this.initData(16);
 		} catch (RdesktopException e) {
-			/* awt
-			Rdesktop.error(e, this, frame, false);
-			*/
+			/*
+			 * awt Rdesktop.error(e, this, frame, false);
+			 */
 		}
 
 		data.setLittleEndian16(1); /* number of events */
@@ -1348,23 +1350,23 @@ public class Rdp {
 			this.sendData(data, RDP_DATA_PDU_INPUT);
 		} catch (RdesktopException r) {
 			if (Common.rdp.isConnected())
-				/* awt
-				Rdesktop.error(r, Common.rdp, Common.frame, true);
-				*/
-			Common.exit();
+				/*
+				 * awt Rdesktop.error(r, Common.rdp, Common.frame, true);
+				 */
+				Common.exit();
 		} catch (CryptoException c) {
 			if (Common.rdp.isConnected())
 				/*
-				Rdesktop.error(c, Common.rdp, Common.frame, true);
-				*/
-				
-			Common.exit();
+				 * Rdesktop.error(c, Common.rdp, Common.frame, true);
+				 */
+
+				Common.exit();
 		} catch (IOException i) {
 			if (Common.rdp.isConnected())
-				/* awt
-				Rdesktop.error(i, Common.rdp, Common.frame, true);
-				*/
-			Common.exit();
+				/*
+				 * awt Rdesktop.error(i, Common.rdp, Common.frame, true);
+				 */
+				Common.exit();
 		}
 	}
 
@@ -1398,9 +1400,9 @@ public class Rdp {
 			y = data.getLittleEndian16();
 
 			if (data.getPosition() <= data.getEnd()) {
-				/* 
-				surface.movePointer(x, y);
-				*/
+				/*
+				 * surface.movePointer(x, y);
+				 */
 			}
 			break;
 
@@ -1429,9 +1431,9 @@ public class Rdp {
 		switch (system_pointer_type) {
 		case RDP_NULL_POINTER:
 			logger.debug("RDP_NULL_POINTER");
-			/* awt
-			surface.setCursor(null);
-			*/
+			/*
+			 * awt surface.setCursor(null);
+			 */
 			break;
 
 		default:
@@ -1452,14 +1454,17 @@ public class Rdp {
 		int minX, minY, maxX, maxY;
 
 		maxX = maxY = 0;
-		
+
 		minX = 300;
 		minY = 400;
-		/* awt
-		minX = surface.getWidth();
-		minY = surface.getHeight();
-		*/
+		/*
+		 * awt minX = surface.getWidth(); minY = surface.getHeight();
+		 */
 
+		// 增加的
+		minX = 480;
+		minY = 800;
+		// ---
 		n_updates = data.getLittleEndian16();
 
 		for (int i = 0; i < n_updates; i++) {
@@ -1504,10 +1509,17 @@ public class Rdp {
 					data.incrementPosition(width * Bpp);
 				}
 
-				/* awt
-				surface.displayImage(Bitmap.convertImage(pixel, Bpp), width,
-						height, left, top, cx, cy);
-						*/
+				// 显示图片
+				int[] bitmap = Bitmap.convertImage(pixel, Bpp);
+
+				// BitmapFactory.decodeByteArray(pixel, 0, length)
+				// surface.displayImage(Bitmap.convertImage(pixel, Bpp),
+				// width, height, left, top, cx, cy);
+
+				/*
+				 * awt surface.displayImage(Bitmap.convertImage(pixel, Bpp),
+				 * width, height, left, top, cx, cy);
+				 */
 				continue;
 			}
 
@@ -1524,52 +1536,88 @@ public class Rdp {
 			}
 			if (Bpp == 1) {
 				/*
+				 * pixel = Bitmap.decompress(width, height, size, data, Bpp);
+				 */
+
 				pixel = Bitmap.decompress(width, height, size, data, Bpp);
-				*/
-				if (pixel != null){}
-					/* awt
-					surface.displayImage(Bitmap.convertImage(pixel, Bpp),
-							width, height, left, top, cx, cy);
-							*/
+
+				if (pixel != null) {
+					// 显示出图像出来
+					// surface.displayImage(Bitmap.convertImage(pixel, Bpp),
+					// width, height, left, top, cx, cy);
+				}
+				/*
+				 * awt surface.displayImage(Bitmap.convertImage(pixel, Bpp),
+				 * width, height, left, top, cx, cy);
+				 */
+
 				else
 					logger.warn("Could not decompress bitmap");
 			} else {
 
 				if (Options.bitmap_decompression_store == Options.INTEGER_BITMAP_DECOMPRESSION) {
-					/* awt
+
 					int[] pixeli = Bitmap.decompressInt(width, height, size,
 							data, Bpp);
-					if (pixeli != null)
-						surface.displayImage(pixeli, width, height, left, top,
-								cx, cy);
-								*/
-						logger.warn("Could not decompress bitmap");
+					
+					if (pixeli != null){
+
+
+						int[] colors = new int[pixeli.length];
+						int value = 0;
+						for (int ii=0;i<pixeli.length;i++){
+							value = new   Integer(pixeli[i]).intValue();
+							colors[i] = Color.argb(Color.alpha(value), Color.red(value),Color.green(value),Color.blue(value));
+						}	
+						android.graphics.Bitmap bm =  android.graphics.Bitmap.createBitmap(colors, width, height, Config.RGB_565);
+						
+						
+						if(bm.getHeight()>100){
+							int ii=0;
+							
+							
+							ii++;
+						}
+						
+						
+						
+					}else
+
+//						surface.displayImage(pixeli, width, height, left, top,
+//								cx, cy);
+
+					/*
+					 * awt int[] pixeli = Bitmap.decompressInt(width, height,
+					 * size, data, Bpp); if (pixeli != null)
+					 * surface.displayImage(pixeli, width, height, left, top,
+					 * cx, cy);
+					 */
+					logger.warn("Could not decompress bitmap");
 				} else if (Options.bitmap_decompression_store == Options.BUFFEREDIMAGE_BITMAP_DECOMPRESSION) {
-					/* awt
-					Image pix = Bitmap.decompressImg(width, height, size, data,
-							Bpp, null);
-					if (pix != null)
-						surface.displayImage(pix, left, top);
-						*/
-						logger.warn("Could not decompress bitmap");
+					/*
+					 * awt Image pix = Bitmap.decompressImg(width, height, size,
+					 * data, Bpp, null); if (pix != null)
+					 * surface.displayImage(pix, left, top);
+					 */
+					logger.warn("Could not decompress bitmap");
 				} else {
-					/* awt
-					surface.displayCompressed(left, top, width, height, size,
-							data, Bpp, null);
-							*/
+					/*
+					 * awt surface.displayCompressed(left, top, width, height,
+					 * size, data, Bpp, null);
+					 */
 				}
 			}
 		}
-		/* awt
-		surface.repaint(minX, minY, maxX - minX + 1, maxY - minY + 1);
-		*/
+		/*
+		 * awt surface.repaint(minX, minY, maxX - minX + 1, maxY - minY + 1);
+		 */
 	}
 
 	protected void processPalette(RdpPacket_Localised data) {
 		int n_colors = 0;
-		/* awt
-		IndexColorModel cm = null;
-		*/
+		/*
+		 * awt IndexColorModel cm = null;
+		 */
 		byte[] palette = null;
 
 		byte[] red = null;
@@ -1592,28 +1640,26 @@ public class Rdp {
 			blue[i] = palette[j + 2];
 			j += 3;
 		}
-		/* awt
-		cm = new IndexColorModel(8, n_colors, red, green, blue);
-		surface.registerPalette(cm);
-		*/
+		/*
+		 * awt cm = new IndexColorModel(8, n_colors, red, green, blue);
+		 * surface.registerPalette(cm);
+		 */
 	}
-	/* awt
-	public void registerDrawingSurface(RdesktopFrame fr) {
-		
-		this.frame = fr;
-		RdesktopCanvas ds = fr.getCanvas();
-		this.surface = ds;
-		orders.registerDrawingSurface(ds);
-	}
-*/
+
+	/*
+	 * awt public void registerDrawingSurface(RdesktopFrame fr) {
+	 * 
+	 * this.frame = fr; RdesktopCanvas ds = fr.getCanvas(); this.surface = ds;
+	 * orders.registerDrawingSurface(ds); }
+	 */
 	/* Process a null system pointer PDU */
 	protected void process_null_system_pointer_pdu(RdpPacket_Localised s)
 			throws RdesktopException {
 		// FIXME: We should probably set another cursor here,
 		// like the X window system base cursor or something.
-		/* awt
-		surface.setCursor(cache.getCursor(0));
-		*/
+		/*
+		 * awt surface.setCursor(cache.getCursor(0));
+		 */
 	}
 
 	protected void process_colour_pointer_pdu(RdpPacket_Localised data)
@@ -1621,9 +1667,9 @@ public class Rdp {
 		logger.debug("Rdp.RDP_POINTER_COLOR");
 		int x = 0, y = 0, width = 0, height = 0, cache_idx = 0, masklen = 0, datalen = 0;
 		byte[] mask = null, pixel = null;
-		/* awt
-		Cursor cursor = null;
-*/
+		/*
+		 * awt Cursor cursor = null;
+		 */
 		cache_idx = data.getLittleEndian16();
 		x = data.getLittleEndian16();
 		y = data.getLittleEndian16();
@@ -1637,13 +1683,12 @@ public class Rdp {
 		data.incrementPosition(datalen);
 		data.copyToByteArray(mask, 0, data.getPosition(), masklen);
 		data.incrementPosition(masklen);
-		/* awt
-		cursor = surface.createCursor(x, y, width, height, mask, pixel,
-				cache_idx);
-		// logger.info("Creating and setting cursor " + cache_idx);
-		surface.setCursor(cursor);
-		cache.putCursor(cache_idx, cursor);
-		*/
+		/*
+		 * awt cursor = surface.createCursor(x, y, width, height, mask, pixel,
+		 * cache_idx); // logger.info("Creating and setting cursor " +
+		 * cache_idx); surface.setCursor(cursor); cache.putCursor(cache_idx,
+		 * cursor);
+		 */
 	}
 
 	protected void process_cached_pointer_pdu(RdpPacket_Localised data)
@@ -1651,8 +1696,21 @@ public class Rdp {
 		logger.debug("Rdp.RDP_POINTER_CACHED");
 		int cache_idx = data.getLittleEndian16();
 		// logger.info("Setting cursor "+cache_idx);
-		/* awt
-		surface.setCursor(cache.getCursor(cache_idx));
-		*/
+		/*
+		 * awt surface.setCursor(cache.getCursor(cache_idx));
+		 */
+	}
+
+	public void displayImage(int[] data, int w, int h, int x, int y, int cx,
+			int cy) {
+
+		// backstore.setRGB(x, y, cx, cy, data, 0, w);
+
+		/*  ********* Useful test for identifying image boundaries ************ */
+		// Graphics g = backstore.getGraphics();
+		// g.drawImage(data,x,y,null);
+		// g.setColor(Color.RED);
+		// g.drawRect(x,y,cx,cy);
+		// g.dispose();
 	}
 }
